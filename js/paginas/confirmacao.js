@@ -44,10 +44,10 @@
     let titulo = 'Pedido confirmado!';
     let texto = `Já estamos separando suas frutas. Mandamos os detalhes para <strong>${email}</strong>.`;
     if (!pago) {
-      titulo = 'Falta só pagar';
+      titulo = 'Falta só simular o pagamento';
       texto = pg.forma === 'pix'
-        ? 'Seu pedido está reservado. Pague o Pix abaixo para a gente começar a separar.'
-        : 'Seu pedido está reservado. Assim que o boleto compensar, começamos a separar.';
+        ? 'Esta loja é uma simulação e não gera Pix de verdade. Use o botão abaixo para simular o pagamento.'
+        : 'Esta loja é uma simulação e não emite boleto de verdade. Use o botão abaixo para simular a compensação.';
     }
 
     main.innerHTML = `${Ui.passos(3)}
@@ -89,26 +89,22 @@
       const parcelas = pg.parcelas > 1 ? `${pg.parcelas}x de ${Ui.brl(pg.valorParcela)}` : 'à vista';
       return `${Ui.icone('cartao', 20)} <span>${pg.bandeira} final ${pg.final}, ${parcelas}</span>`;
     }
-    if (pg.forma === 'pix') return `${Ui.icone('pix', 20)} <span>Pix ${pedido.status === 'pago' ? 'recebido' : 'aguardando pagamento'}</span>`;
-    return `${Ui.icone('boleto', 20)} <span>Boleto ${pedido.status === 'pago' ? 'compensado' : `com vencimento em ${data(pg.vencimento)}`}</span>`;
+    if (pg.forma === 'pix') return `${Ui.icone('pix', 20)} <span>Pix simulado, ${pedido.status === 'pago' ? 'recebido' : 'aguardando'}</span>`;
+    return `${Ui.icone('boleto', 20)} <span>Boleto simulado, ${pedido.status === 'pago' ? 'compensado' : 'aguardando'}</span>`;
   }
 
   function blocoPix() {
-    const pg = pedido.pagamento;
     return `<section class="painel">
-      <h2>Pague com Pix</h2>
+      <h2>Pix simulado</h2>
       <div class="pagar">
-        <div class="pagar__qr">${qrCode(pg.codigo)}</div>
+        <div class="pagar__figura">${figuraSimulacao()}</div>
         <div>
+          <p class="aviso aviso--simulacao"><strong>Não existe Pix para pagar.</strong> Aqui não tem QR Code nem copia e cola: esta loja é uma demonstração e não recebe dinheiro de ninguém.</p>
           <ol>
-            <li>Abra o app do seu banco e entre na área Pix</li>
-            <li>Escaneie o QR Code ou use o copia e cola</li>
-            <li>Confira o valor de <strong>${Ui.brl(pedido.total)}</strong> e confirme</li>
+            <li>Numa loja de verdade, você pagaria <strong>${Ui.brl(pedido.total)}</strong> pelo app do banco</li>
+            <li>Aqui, clique em <strong>Simular pagamento</strong></li>
+            <li>O pedido passa para pago, sem nenhuma cobrança</li>
           </ol>
-          <div class="copia">
-            <code class="codigo" title="${pg.codigo}">${pg.codigo}</code>
-            <button class="btn btn--claro btn--p" type="button" data-copiar="${pg.codigo}">${Ui.icone('copiar', 16)} Copiar</button>
-          </div>
           <div class="pagar__rodape">
             <p class="pagar__prazo">Expira em <strong id="contagem">30:00</strong></p>
             <button class="btn btn--p" type="button" id="simular">Simular pagamento</button>
@@ -121,15 +117,21 @@
   function blocoBoleto() {
     const pg = pedido.pagamento;
     return `<section class="painel">
-      <h2>Boleto bancário</h2>
-      ${codigoDeBarras(pg.linhaDigitavel)}
-      <div class="copia">
-        <code class="codigo" title="${pg.linhaDigitavel}">${pg.linhaDigitavel}</code>
-        <button class="btn btn--claro btn--p" type="button" data-copiar="${pg.linhaDigitavel.replace(/\D/g, '')}">${Ui.icone('copiar', 16)} Copiar</button>
-      </div>
-      <div class="pagar__rodape">
-        <p class="pagar__prazo">Vence em <strong>${data(pg.vencimento)}</strong></p>
-        <button class="btn btn--p" type="button" id="simular">Simular compensação</button>
+      <h2>Boleto simulado</h2>
+      <div class="pagar">
+        <div class="pagar__figura">${figuraSimulacao()}</div>
+        <div>
+          <p class="aviso aviso--simulacao"><strong>Não existe boleto para pagar.</strong> Aqui não tem código de barras nem linha digitável: esta loja é uma demonstração e não recebe dinheiro de ninguém.</p>
+          <ol>
+            <li>Numa loja de verdade, você pagaria <strong>${Ui.brl(pedido.total)}</strong> até ${data(pg.vencimento)}</li>
+            <li>Aqui, clique em <strong>Simular compensação</strong></li>
+            <li>O pedido passa para pago, sem nenhuma cobrança</li>
+          </ol>
+          <div class="pagar__rodape">
+            <p class="pagar__prazo">Venceria em <strong>${data(pg.vencimento)}</strong></p>
+            <button class="btn btn--p" type="button" id="simular">Simular compensação</button>
+          </div>
+        </div>
       </div>
     </section>`;
   }
@@ -165,7 +167,6 @@
   }
 
   function ligarBotoes() {
-    Ui.$$('[data-copiar]').forEach(b => b.addEventListener('click', () => Ui.copiar(b.dataset.copiar)));
     const simular = Ui.$('#simular');
     if (!simular) return;
     simular.addEventListener('click', async () => {
@@ -197,45 +198,16 @@
     relogio = setInterval(tick, 1000);
   }
 
-  // QR Code de enfeite: tem os três quadrados de posição de um QR de verdade,
-  // mas o miolo é gerado a partir do texto e não é lido por câmera.
-  function qrCode(texto) {
-    const n = 29;
-    let semente = 0;
-    for (let i = 0; i < texto.length; i++) semente = (semente * 31 + texto.charCodeAt(i)) >>> 0;
-    const aleatorio = () => {
-      semente = (semente * 1103515245 + 12345) >>> 0;
-      return (semente >>> 16) / 65536;
-    };
-    const localizador = (l, c) => {
-      if (l === 7 || c === 7) return false;
-      if (l === 0 || l === 6 || c === 0 || c === 6) return true;
-      return l >= 2 && l <= 4 && c >= 2 && c <= 4;
-    };
-    let caminho = '';
-    for (let l = 0; l < n; l++) {
-      for (let c = 0; c < n; c++) {
-        let escuro;
-        if (l < 8 && c < 8) escuro = localizador(l, c);
-        else if (l < 8 && c >= n - 8) escuro = localizador(l, n - 1 - c);
-        else if (l >= n - 8 && c < 8) escuro = localizador(n - 1 - l, c);
-        else escuro = aleatorio() > 0.52;
-        if (escuro) caminho += `M${c} ${l}h1v1h-1z`;
-      }
-    }
-    return `<svg viewBox="-1 -1 ${n + 2} ${n + 2}" shape-rendering="crispEdges" role="img" aria-label="QR Code do Pix"><path d="${caminho}" fill="#1d2a1e"/></svg>`;
-  }
-
-  function codigoDeBarras(linha) {
-    const digitos = linha.replace(/\D/g, '');
-    let x = 0;
-    let barras = '';
-    for (const d of digitos) {
-      const largura = 1 + (Number(d) % 3);
-      barras += `<rect x="${x}" y="0" width="${largura}" height="60"/>`;
-      x += largura + 1 + (Number(d) % 2);
-    }
-    return `<svg class="barras" viewBox="0 0 ${x} 60" preserveAspectRatio="none" aria-hidden="true"><g fill="#1d2a1e">${barras}</g></svg>`;
+  // Fica no lugar do QR Code e do código de barras. É um abacate de propósito:
+  // nada aqui pode ser escaneado nem pago, a loja só simula a compra.
+  function figuraSimulacao() {
+    return `<svg viewBox="0 0 120 120" role="img" aria-label="Abacate. Esta loja é uma simulação e não gera cobrança">
+      <path d="M60 10c-15 0-24 15-27 31-2 11-11 19-11 36a38 38 0 0 0 76 0c0-17-9-25-11-36-3-16-12-31-27-31z" fill="#3f7d3a"/>
+      <path d="M60 20c-10 0-16 12-19 25-2 10-9 17-9 31a28 28 0 0 0 56 0c0-14-7-21-9-31-3-13-9-25-19-25z" fill="#d9e8a3"/>
+      <circle cx="60" cy="78" r="16" fill="#8a5a2b"/>
+      <circle cx="54" cy="72" r="4" fill="#b98552"/>
+    </svg>
+    <span>Simulação</span>`;
   }
 
   function confete() {

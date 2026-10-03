@@ -20,6 +20,14 @@
   const DESCONTO_PIX = 0.05;
   const PARCELA_MINIMA = 20;
   const MAX_PARCELAS = 6;
+  // Números públicos de teste das bandeiras. Nenhum deles é um cartão real.
+  const CARTOES_DE_TESTE = [
+    '4111111111111111', // Visa
+    '5555555555554444', // Mastercard
+    '378282246310005',  // Amex
+    '6362970000457013', // Elo
+    '6062825624254001'  // Hipercard
+  ];
 
   class ApiError extends Error {
     constructor(mensagem, status = 400, campo = null) {
@@ -244,6 +252,11 @@
     if (numero.length < 13 || numero.length > 19 || !luhn(numero)) {
       throw new ApiError('Número de cartão inválido', 422, 'numero');
     }
+    // A loja é uma simulação e não cobra ninguém. Para ninguém digitar o
+    // cartão de verdade aqui, só passam os números de teste conhecidos.
+    if (!CARTOES_DE_TESTE.includes(numero)) {
+      throw new ApiError('Esta loja é uma simulação. Não use seu cartão de verdade: use o cartão de teste 4111 1111 1111 1111.', 422, 'numero');
+    }
     const titular = String(cartao.nome || '').trim();
     if (titular.length < 3) throw new ApiError('Informe o nome impresso no cartão', 422, 'titular');
 
@@ -264,40 +277,6 @@
     }
 
     return { bandeira: bandeira(numero) || 'Cartão', final: numero.slice(-4), titular: titular.toUpperCase() };
-  }
-
-  function hash(texto) {
-    let h = 5381;
-    for (let i = 0; i < texto.length; i++) h = ((h << 5) + h + texto.charCodeAt(i)) >>> 0;
-    return h;
-  }
-
-  function codigoPix(numero, total) {
-    const campo = (id, valor) => id + String(valor.length).padStart(2, '0') + valor;
-    const chave = campo('00', 'BR.GOV.BCB.PIX') + campo('01', `pix@abacatemucho.com.br`);
-    const corpo = '000201'
-      + campo('26', chave)
-      + '52040000'
-      + '5303986'
-      + campo('54', total.toFixed(2))
-      + '5802BR'
-      + campo('59', 'ABACATE MUCHO')
-      + campo('60', 'SAO PAULO')
-      + campo('62', campo('05', `AM${numero}`))
-      + '6304';
-    return corpo + hash(corpo).toString(16).toUpperCase().slice(-4).padStart(4, '0');
-  }
-
-  function linhaDigitavel(numero, total) {
-    let semente = hash(`boleto-${numero}`);
-    let digitos = '';
-    while (digitos.length < 33) {
-      semente = (semente * 1103515245 + 12345) >>> 0;
-      digitos += String(semente % 10);
-    }
-    digitos = '23793' + digitos.slice(5) + String(Math.round(total * 100)).padStart(14, '0');
-    const d = digitos;
-    return `${d.slice(0, 5)}.${d.slice(5, 10)} ${d.slice(10, 15)}.${d.slice(15, 21)} ${d.slice(21, 26)}.${d.slice(26, 32)} ${d.slice(32, 33)} ${d.slice(33)}`;
   }
 
   // ---------------------------------------------------------------------------
@@ -455,12 +434,11 @@
         if (!opcao) throw new ApiError('Parcelamento inválido', 422, 'parcelas');
         Object.assign(pagamento, validarCartao(cartao), { parcelas: vezes, valorParcela: opcao.valor });
       } else if (forma === 'pix') {
+        // Nada de código Pix nem linha digitável: a loja não gera cobrança.
         status = 'aguardando';
-        pagamento.codigo = codigoPix(numero, carrinho.total);
         pagamento.expiraEm = new Date(agora.getTime() + 30 * 60 * 1000).toISOString();
       } else {
         status = 'aguardando';
-        pagamento.linhaDigitavel = linhaDigitavel(numero, carrinho.total);
         pagamento.vencimento = new Date(agora.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString();
       }
 

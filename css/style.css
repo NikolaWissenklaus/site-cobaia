@@ -823,6 +823,7 @@ button, input, select { font: inherit; color: inherit; }
 .carregando-linha .spinner { color: var(--verde); }
 
 .aviso { margin: 18px 0 0; padding: 12px 14px; border: 1px solid #f0dc9f; border-radius: 12px; background: #fff9e6; font-size: .88rem; }
+.aviso--simulacao { margin: 0 0 18px; }
 .aviso code { padding: 1px 6px; border-radius: 5px; background: #fff; font-weight: 700; }
 
 .erro-geral {
@@ -901,28 +902,16 @@ button, input, select { font: inherit; color: inherit; }
 @keyframes cai { to { transform: translateY(110vh) rotate(540deg); } }
 
 .pagar { display: grid; grid-template-columns: 190px minmax(0, 1fr); align-items: start; gap: 24px; }
-.pagar__qr { padding: 12px; border: 1.5px solid var(--borda); border-radius: 16px; background: #fff; }
-.pagar__qr svg { width: 100%; height: auto; }
+.pagar__figura { padding: 12px; border: 1.5px dashed var(--borda); border-radius: 16px; background: #fff; text-align: center; }
+.pagar__figura svg { display: block; width: 100%; height: auto; }
+.pagar__figura span { display: block; margin-top: 6px; color: var(--suave); font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.pagar .aviso--simulacao { margin: 0 0 14px; }
 .pagar ol { margin: 0 0 16px; padding-left: 20px; color: var(--suave); }
 .pagar ol li { margin-bottom: 4px; }
 .pagar ol strong { color: var(--tinta); }
-.copia { display: flex; gap: 8px; margin-bottom: 14px; }
-.codigo {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: var(--fundo);
-  font-family: ui-monospace, Consolas, monospace;
-  font-size: .8rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 .pagar__rodape { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .pagar__prazo { margin: 0; color: var(--suave); font-size: .9rem; }
 .pagar__prazo strong { color: var(--tinta); font-variant-numeric: tabular-nums; }
-.barras { display: block; width: 100%; height: 64px; margin: 4px 0 14px; }
 
 .linha-tempo { margin: 0; padding: 0; list-style: none; }
 .linha-tempo li { position: relative; display: flex; gap: 14px; padding-bottom: 20px; color: var(--suave); }
@@ -1130,7 +1119,7 @@ button, input, select { font: inherit; color: inherit; }
   .campo, .c3, .c4 { grid-column: span 2; }
   .c1, .c2 { grid-column: span 1; }
   .pagar { grid-template-columns: minmax(0, 1fr); }
-  .pagar__qr { max-width: 200px; margin: 0 auto; }
+  .pagar__figura { max-width: 200px; margin: 0 auto; }
   .ficha div { grid-template-columns: 1fr; gap: 2px; }
   .rodape__grade { grid-template-columns: 1fr; }
   .toasts { left: 16px; right: 16px; bottom: 16px; align-items: stretch; }

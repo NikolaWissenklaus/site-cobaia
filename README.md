@@ -1,7 +1,6 @@
 # Abacate Mucho
 
 Loja virtual de frutas feita só com HTML, CSS e JavaScript puro. Não tem servidor: o "backend" e o login são simulados no navegador.
-https://nikolawissenklaus.github.io/site-cobaia/index.html
 
 ## Como rodar
 
@@ -26,8 +25,8 @@ python -m http.server 8000
 | `artigos.html` e `artigos.html?a=...` | Lista dos artigos do blog e a leitura de cada um, com convite para o produto citado |
 | `carrinho.html` | Itens, quantidades e barra de frete grátis |
 | `entrega.html` | Dados de contato, endereço (preenchido pelo ViaCEP quando tem internet) e forma de entrega |
-| `pagamento.html` | Cartão, Pix (5% off) ou boleto |
-| `confirmacao.html?pedido=...` | Pedido finalizado, com QR Code do Pix ou linha digitável do boleto |
+| `pagamento.html` | Cartão, Pix (5% off) ou boleto, tudo simulado |
+| `confirmacao.html?pedido=...` | Pedido finalizado. No Pix e no boleto aparece um abacate no lugar do QR Code e do código de barras, com o botão de simular o pagamento |
 
 ## Como o backend é simulado
 
@@ -41,6 +40,14 @@ python -m http.server 8000
 Se o pagamento falhar, nada é gravado. Abra o console para ver as chamadas passando (`POST /carrinho/itens 200`, etc.).
 
 Para testar o cartão use `4111 1111 1111 1111` com qualquer validade futura. O CVV `000` simula recusa da operadora.
+
+## Ninguém é cobrado
+
+A loja não fala com banco, operadora nem gateway. Para não deixar margem de dúvida:
+
+- Pix: não existe QR Code, chave nem código copia e cola. A tela mostra um abacate e o botão **Simular pagamento**;
+- boleto: não existe código de barras nem linha digitável. O botão **Simular compensação** marca o pedido como pago;
+- cartão: só os números públicos de teste das bandeiras são aceitos (lista em `CARTOES_DE_TESTE`, no `js/api.js`). Qualquer outro número é recusado, os campos não usam o preenchimento automático do navegador e do cartão só ficam guardados a bandeira, os 4 últimos dígitos e o nome.
 
 Para voltar ao estoque inicial, use **Restaurar estoque e carrinho** no rodapé.
 

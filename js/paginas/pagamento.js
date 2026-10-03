@@ -8,9 +8,9 @@
   let forma = 'cartao';
 
   const TEXTO_BOTAO = {
-    cartao: total => `Pagar ${Ui.brl(total)}`,
-    pix: total => `Gerar Pix de ${Ui.brl(total)}`,
-    boleto: total => `Gerar boleto de ${Ui.brl(total)}`
+    cartao: total => `Simular pagamento de ${Ui.brl(total)}`,
+    pix: total => `Simular Pix de ${Ui.brl(total)}`,
+    boleto: total => `Simular boleto de ${Ui.brl(total)}`
   };
 
   async function iniciar() {
@@ -56,6 +56,7 @@
 
           <form class="painel" id="form-pagamento" novalidate>
             <h1 class="painel__titulo">Pagamento</h1>
+            <p class="aviso aviso--simulacao"><strong>Loja de demonstração.</strong> Nenhum valor é cobrado e nenhum produto é entregue. Não informe dados reais de pagamento.</p>
             <div class="formas" role="radiogroup" aria-label="Forma de pagamento">
               ${opcaoForma('cartao', 'Cartão de crédito', 'Até 6x sem juros', 'cartao')}
               ${opcaoForma('pix', 'Pix', 'Aprovação na hora', 'pix', '5% off')}
@@ -67,33 +68,33 @@
                 <div class="campo c6">
                   <label for="f-numero">Número do cartão</label>
                   <div class="campo__com-selo">
-                    <input id="f-numero" name="numero" required inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" pattern="[\\d ]{15,23}" data-erro="Número incompleto">
+                    <input id="f-numero" name="numero" required inputmode="numeric" autocomplete="off" value="4111 1111 1111 1111" placeholder="0000 0000 0000 0000" pattern="[\\d ]{15,23}" data-erro="Número incompleto">
                     <span class="campo__selo" id="bandeira" hidden></span>
                   </div>
                   <small class="campo__erro"></small>
                 </div>
-                ${Ui.campo({ nome: 'titular', rotulo: 'Nome impresso no cartão', valor: contato.nome.toUpperCase(), attrs: 'required minlength="3" autocomplete="cc-name" style="text-transform:uppercase"', erro: 'Informe o nome do cartão' })}
-                ${Ui.campo({ nome: 'validade', rotulo: 'Validade', largura: 3, attrs: 'required inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" pattern="(0[1-9]|1[0-2])/\\d{2}"', erro: 'Use o formato MM/AA' })}
-                ${Ui.campo({ nome: 'cvv', rotulo: 'CVV', largura: 3, attrs: 'required inputmode="numeric" autocomplete="cc-csc" placeholder="123" pattern="\\d{3,4}"', erro: '3 ou 4 dígitos no verso' })}
+                ${Ui.campo({ nome: 'titular', rotulo: 'Nome impresso no cartão', valor: contato.nome.toUpperCase(), attrs: 'required minlength="3" autocomplete="off" style="text-transform:uppercase"', erro: 'Informe o nome do cartão' })}
+                ${Ui.campo({ nome: 'validade', rotulo: 'Validade', largura: 3, attrs: 'required inputmode="numeric" autocomplete="off" placeholder="MM/AA" pattern="(0[1-9]|1[0-2])/\\d{2}"', erro: 'Use o formato MM/AA' })}
+                ${Ui.campo({ nome: 'cvv', rotulo: 'CVV', largura: 3, attrs: 'required inputmode="numeric" autocomplete="off" placeholder="123" pattern="\\d{3,4}"', erro: '3 ou 4 dígitos no verso' })}
                 <div class="campo c6">
                   <label for="f-parcelas">Parcelas</label>
                   <select id="f-parcelas" name="parcelas"></select>
                 </div>
               </div>
-              <p class="aviso"><strong>Ambiente de teste.</strong> Use o cartão <code>4111 1111 1111 1111</code> com qualquer validade futura. O CVV <code>000</code> simula um pagamento recusado.</p>
+              <p class="aviso"><strong>Ambiente de teste.</strong> Só o cartão de teste <code>4111 1111 1111 1111</code> é aceito, com qualquer validade futura. Cartões de verdade são recusados. O CVV <code>000</code> simula um pagamento recusado.</p>
             </div>
 
             <div data-painel="pix" hidden>
               <div class="explica">
                 ${Ui.icone('pix', 24)}
-                <p>Ao confirmar, geramos um QR Code e um código copia e cola. O pagamento cai na hora e o Pix vale por 30 minutos. Você ganha <strong>5% de desconto</strong> no valor dos produtos.</p>
+                <p>Numa loja de verdade, aqui sairia um QR Code e um código copia e cola. Nesta simulação nenhum Pix é gerado: na próxima tela é só clicar em <strong>Simular pagamento</strong>. O desconto de <strong>5%</strong> nos produtos continua valendo na conta.</p>
               </div>
             </div>
 
             <div data-painel="boleto" hidden>
               <div class="explica">
                 ${Ui.icone('boleto', 24)}
-                <p>O boleto vence em 3 dias úteis e pode levar até 2 dias para compensar. Separamos as frutas assim que o pagamento for confirmado.</p>
+                <p>Numa loja de verdade, o boleto venceria em 3 dias úteis. Nesta simulação nenhum boleto é emitido: na próxima tela é só clicar em <strong>Simular compensação</strong>.</p>
               </div>
             </div>
 
@@ -105,7 +106,7 @@
           <h2>Resumo do pedido</h2>
           <div class="resumo__conteudo" id="resumo"></div>
           <button class="btn btn--bloco btn--grande" type="submit" form="form-pagamento" id="pagar"></button>
-          <p class="resumo__seguro">${Ui.icone('escudo', 16)} Pagamento criptografado</p>
+          <p class="resumo__seguro">${Ui.icone('escudo', 16)} Simulação: nada é cobrado</p>
         </aside>
       </div>`;
 
@@ -121,6 +122,8 @@
       selo.hidden = !nome;
       selo.textContent = nome || '';
     });
+    // O campo já vem com o cartão de teste, então mostra a bandeira dele.
+    numero.dispatchEvent(new Event('input'));
 
     form.addEventListener('input', ev => {
       Ui.marcarErro(ev.target, '');
@@ -186,7 +189,7 @@
       dados.parcelas = valor('parcelas');
     }
 
-    const textos = { cartao: 'Falando com a operadora', pix: 'Gerando Pix', boleto: 'Gerando boleto' };
+    const textos = { cartao: 'Simulando a operadora', pix: 'Simulando Pix', boleto: 'Simulando boleto' };
     try {
       const pedido = await Ui.ocupado(Ui.$('#pagar'), () => Api.finalizarPedido(dados), textos[forma]);
       Ui.$('#pagar').disabled = true;
