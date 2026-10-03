@@ -1,6 +1,7 @@
 # Abacate Mucho
 
 Loja virtual de frutas feita só com HTML, CSS e JavaScript puro. Não tem servidor: o "backend" e o login são simulados no navegador.
+https://nikolawissenklaus.github.io/site-cobaia/
 
 ## Como rodar
 
