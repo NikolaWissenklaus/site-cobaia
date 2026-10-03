@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Abacate Mucho | Frutas frescas na sua casa</title>
+  <meta name="description" content="Frutas verdes e vermelhas colhidas nesta semana, entregues geladas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-pagina="inicio">
+  <main class="container">
+    <section class="carrossel" id="banners" aria-roledescription="carrossel" aria-label="Ofertas em destaque">
+      <div class="esqueleto carrossel__esqueleto"></div>
+    </section>
+
+    <ul class="beneficios">
+      <li>
+        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        <div><strong>Entrega refrigerada</strong><span>Caixa térmica até a porta</span></div>
+      </li>
+      <li>
+        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+        <div><strong>Colhidas na semana</strong><span>Direto de produtores parceiros</span></div>
+      </li>
+      <li>
+        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2.5 9.5 9.5-9.5 9.5L2.5 12z"/><path d="m8.5 12 3.5-3.5 3.5 3.5-3.5 3.5z"/></svg>
+        <div><strong>5% off no Pix</strong><span>Desconto aplicado na hora</span></div>
+      </li>
+      <li>
+        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        <div><strong>Troca garantida</strong><span>Chegou machucada? A gente troca</span></div>
+      </li>
+    </ul>
+
+    <section class="secao">
+      <div class="secao__topo">
+        <div>
+          <h2>Escolha pela cor</h2>
+          <p>Duas seleções, cada uma com o melhor da estação.</p>
+        </div>
+      </div>
+      <div class="categorias">
+        <a class="cat-tile cat-tile--verdes" href="categoria.html?c=verdes">
+          <div>
+            <span class="cat-tile__sobre">Ácidas e crocantes</span>
+            <h3>Frutas verdes</h3>
+            <p>Maçã verde, kiwi, abacate, pera, limão e mais.</p>
+            <span class="cat-tile__cta">Ver frutas verdes <svg class="icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+          <div class="cat-tile__arte" aria-hidden="true"><span>🥝</span><span>🍏</span><span>🥑</span></div>
+        </a>
+        <a class="cat-tile cat-tile--vermelhas" href="categoria.html?c=vermelhas">
+          <div>
+            <span class="cat-tile__sobre">Doces e suculentas</span>
+            <h3>Frutas vermelhas</h3>
+            <p>Morango, cereja, maçã Fuji, melancia e mais.</p>
+            <span class="cat-tile__cta">Ver frutas vermelhas <svg class="icone" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+          <div class="cat-tile__arte" aria-hidden="true"><span>🍓</span><span>🍒</span><span>🍉</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="secao">
+      <div class="secao__topo">
+        <div>
+          <h2>Ofertas da semana</h2>
+          <p>Preço baixo enquanto durar o estoque.</p>
+        </div>
+      </div>
+      <div class="grade" id="ofertas"></div>
+    </section>
+
+    <section class="secao">
+      <div class="secao__topo">
+        <div>
+          <h2>Mais pedidas</h2>
+          <p>As queridinhas de quem compra toda semana.</p>
+        </div>
+      </div>
+      <div class="grade" id="destaques"></div>
+    </section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/paginas/home.js"></script>
+</body>
+</html>
